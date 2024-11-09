@@ -31,7 +31,7 @@ function Read-HTTPMessage {
   return $text
 }
 
-function Handle-HTTP {
+function New-HTTPHandler {
     param(
         [Parameter(Mandatory=$true)]
         [System.Net.HttpListenerContext]$Context
@@ -122,7 +122,7 @@ do {
     $ws.CloseAsync([System.Net.WebSockets.WebSocketCloseStatus]::NormalClosure, 'Connection closed', [System.Threading.CancellationToken]::None) | Out-Null
     Write-Output 'WebSocket connection closed'
   } else {
-    $listenerShouldClose = Handle-HTTP $context
+    $listenerShouldClose = New-HTTPHandler $context
   }
 
     if ($ws) {
