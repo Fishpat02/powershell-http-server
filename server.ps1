@@ -34,7 +34,7 @@ function Read-HTTPMessage {
 function Handle-HTTP {
     param(
         [Parameter(Mandatory=$true)]
-        [HttpListenerContext]$Context
+        [System.Net.HttpListenerContext]$Context
     )
 
   $request = $Context.Request
@@ -87,7 +87,7 @@ function Handle-HTTP {
 
 }
 
-$listener = New-Object HttpListener
+$listener = New-Object System.Net.HttpListener
 
 $url = 'http://127.0.0.1:8080/'
 
@@ -104,22 +104,22 @@ do {
     $wsContext = $context.AcceptWebSocketAsync([NullString]::Value).Result
     $ws = $wsContext.WebSocket
 
-    while ($ws.State -eq [WebSockets.WebSocketState]::Open) {
+    while ($ws.State -eq [System.Net.WebSockets.WebSocketState]::Open) {
       # Prepare to receive messages
       $buffer = New-Object byte[] 1024
-      $result = $ws.ReceiveAsync([ArraySegment[byte]]$buffer, [Threading.CancellationToken]::None).Result
+      $result = $ws.ReceiveAsync([ArraySegment[byte]]$buffer, [System.Threading.CancellationToken]::None).Result
 
       # Read the message as a string
-      $message = [Text.Encoding]::UTF8.GetString($buffer, 0, $result.Count)
+      $message = [System.Text.Encoding]::UTF8.GetString($buffer, 0, $result.Count)
       Write-Output "Received: $message"
 
       # Echo the message back
-      $echoBuffer = [Text.Encoding]::UTF8.GetBytes("Echo: $message")
-      $ws.SendAsync($echoBuffer, [WebSockets.WebSocketMessageType]::Text, $true, [Threading.CancellationToken]::None) | Out-Null
+      $echoBuffer = [System.Text.Encoding]::UTF8.GetBytes("Echo: $message")
+      $ws.SendAsync($echoBuffer, [System.Net.WebSockets.WebSocketMessageType]::Text, $true, [System.Threading.CancellationToken]::None) | Out-Null
     }
 
     # Close the WebSocket connection
-    $ws.CloseAsync([WebSockets.WebSocketCloseStatus]::NormalClosure, 'Connection closed', [Threading.CancellationToken]::None) | Out-Null
+    $ws.CloseAsync([System.Net.WebSockets.WebSocketCloseStatus]::NormalClosure, 'Connection closed', [System.Threading.CancellationToken]::None) | Out-Null
     Write-Output 'WebSocket connection closed'
   } else {
     $listenerShouldClose = Handle-HTTP $context
@@ -127,9 +127,9 @@ do {
 
     if ($ws) {
     $ws.CloseAsync(
-      [WebSockets.WebSocketCloseStatus]::NormalClosure,
+      [System.Net.WebSockets.WebSocketCloseStatus]::NormalClosure,
       'Connection closed',
-      [Threading.CancellationToken]::None
+      [System.Threading.CancellationToken]::None
     ) | Out-Null
   }
 
